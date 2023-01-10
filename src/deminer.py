@@ -10,17 +10,6 @@ class Deminer:
         self.is_explosed = False
 
         self.first_exploration()
-    
-    def first_exploration(self):
-        empty_places = []
-        
-        for i in range(self.dimensions[0]):
-            for j in range(self.dimensions[1]):
-                if not self.mines_grid[i][j] and self.get_near_mines(i, j) == 0:
-                    empty_places.append((i, j))
-
-        chosen_place = random.choice(empty_places)
-        self.explore(chosen_place[0], chosen_place[1])
 
     def generate_mines_grid(self, percentage: int) -> list[list[int]]:
         grid = []
@@ -42,6 +31,17 @@ class Deminer:
     
     def generate_exploration_grid(self) -> list[list[str]]:
         return [["nothing" for j in range(self.dimensions[1])] for i in range(self.dimensions[0])]
+    
+    def first_exploration(self):
+        empty_places = []
+        
+        for i in range(self.dimensions[0]):
+            for j in range(self.dimensions[1]):
+                if not self.mines_grid[i][j] and self.get_near_mines(i, j) == 0:
+                    empty_places.append((i, j))
+
+        chosen_place = random.choice(empty_places)
+        self.explore(chosen_place[0], chosen_place[1])
     
     def explore(self, i: int, j: int):
         if self.exploration_grid[i][j] == "reported":
@@ -74,6 +74,25 @@ class Deminer:
     
     def is_explosed(self) -> bool:
         return self.is_explosed
+    
+    def result(self) -> int:
+        if self.is_explosed():
+            return -1
+        
+        is_correct = True
+        for i in range(self.dimensions[0]):
+            for j in range(self.dimensions[1]):
+                if self.exploration_grid[i][j] == "nothing":
+                    return 0
+
+                if self.exploration_grid[i][j] == "reported" and self.mines_grid[i][j] == 0:
+                    is_correct = False
+        
+        if is_correct:
+            return 1
+        
+        else:
+            return -1
     
     def get_near_mines(self, i: int, j: int) -> int:
         sum = 0
